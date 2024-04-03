@@ -1,8 +1,14 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_ecashier/models/menu.dart';
 import 'package:flutter_ecashier/services/sqlite.dart';
 
 class BottomDialog {
   final _formKey = GlobalKey<FormState>();
+  TextEditingController titleController = TextEditingController();
+  TextEditingController descriptionController = TextEditingController();
+
   String error = "";
   String title = "";
   String description = "";
@@ -59,6 +65,7 @@ class BottomDialog {
                 ),
                 const SizedBox(height: 16),
                 TextFormField(
+                  controller: titleController,
                   decoration: const InputDecoration(
                     hintText: 'Judul',
                   ),
@@ -74,6 +81,7 @@ class BottomDialog {
                 ),
                 const SizedBox(height: 16),
                 TextFormField(
+                  controller: descriptionController,
                   decoration: const InputDecoration(
                     hintText: 'Deskripsi',
                   ),
@@ -98,13 +106,14 @@ class BottomDialog {
                   child: RawMaterialButton(
                     onPressed: () async {
                       if (_formKey.currentState!.validate()) {
-                        // dynamic result =
-                        //     await SqliteService.createItem(title, description);
-                        // if (result == null) {
-                        //   setState(() {
-                        //     error = "Gagal menambahkan data";
-                        //   });
-                        // }
+                        Map<String, dynamic> data = {
+                          title: titleController.text,
+                          description: descriptionController.text
+                        };
+                        log('data: $data');
+                        dynamic result =
+                            await SqliteService.createItem(data as Menu);
+                        if (result == null) {}
                       }
                     },
                     child: const Center(
