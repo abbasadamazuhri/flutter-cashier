@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_ecashier/pages/dataset/home.dart';
-import 'package:flutter_ecashier/pages/order/home.dart';
+import 'package:flutter_ecashier/pages/dataset.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
-void main() {
+Future main() async {
+  databaseFactoryOrNull = null;
+  sqfliteFfiInit();
+  databaseFactory = databaseFactoryFfi;
+  await databaseFactory.deleteDatabase('ecashier.db');
   runApp(const MainApp());
 }
 
@@ -12,44 +16,7 @@ class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const MaterialApp(
-      home: Main(),
-    );
-  }
-}
-
-class Main extends StatelessWidget {
-  const Main({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: DefaultTabController(
-        length: 2,
-        child: Scaffold(
-          appBar: AppBar(
-            bottom: const TabBar(
-              tabs: [
-                Tab(
-                  icon: Icon(Icons.dataset_outlined),
-                  text: "Daftar Menu",
-                ),
-                Tab(
-                  icon: Icon(Icons.shop_outlined),
-                  text: "Buat Pesanan",
-                ),
-              ],
-            ),
-            title: const Text('eCashier'),
-            backgroundColor: Colors.black,
-          ),
-          body: const TabBarView(
-            children: [
-              DatasetPage(),
-              OrderPage(),
-            ],
-          ),
-        ),
-      ),
+      home: DatasetPage(),
     );
   }
 }

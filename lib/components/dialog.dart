@@ -1,17 +1,20 @@
 import 'dart:developer';
 
+import 'package:elegant_notification/elegant_notification.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_ecashier/models/menu.dart';
-import 'package:flutter_ecashier/services/sqlite.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_ecashier/services/db.dart';
 
 class BottomDialog {
   final _formKey = GlobalKey<FormState>();
-  TextEditingController titleController = TextEditingController();
-  TextEditingController descriptionController = TextEditingController();
+  final titleController = TextEditingController();
+  final descriptionController = TextEditingController();
+  final priceController = TextEditingController();
 
   String error = "";
   String title = "";
   String description = "";
+  String price = "";
 
   showBottomDialog(BuildContext context) {
     showGeneralDialog(
@@ -23,7 +26,7 @@ class BottomDialog {
       pageBuilder: (context, _, __) {
         return Align(
           alignment: Alignment.bottomCenter,
-          child: _buildDialogContent(),
+          child: _buildDialogContent(context),
         );
       },
       transitionBuilder: (_, animation1, __, child) {
@@ -38,7 +41,7 @@ class BottomDialog {
     );
   }
 
-  Widget _buildDialogContent() {
+  Widget _buildDialogContent(BuildContext context) {
     return IntrinsicHeight(
       child: Container(
         width: double.maxFinite,
@@ -59,61 +62,135 @@ class BottomDialog {
                 const Text(
                   'Formulir Menu',
                   style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w500,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
                   ),
-                ),
-                const SizedBox(height: 16),
-                TextFormField(
-                  controller: titleController,
-                  decoration: const InputDecoration(
-                    hintText: 'Judul',
-                  ),
-                  validator: (String? value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Wajib diisi';
-                    }
-                    return null;
-                  },
-                  // onChanged: (value) {
-                  //   setState(() => title = value);
-                  // },
-                ),
-                const SizedBox(height: 16),
-                TextFormField(
-                  controller: descriptionController,
-                  decoration: const InputDecoration(
-                    hintText: 'Deskripsi',
-                  ),
-                  validator: (String? value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Wajib diisi';
-                    }
-                    return null;
-                  },
-                  // onChanged: (value) {
-                  //   setState(() => description = value);
-                  // },
                 ),
                 const SizedBox(height: 16),
                 Container(
-                  height: 40,
+                  height: 50,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    border: Border.all(
+                        width: 1, color: Colors.grey.withOpacity(0.4)),
+                    borderRadius: const BorderRadius.all(Radius.circular(8)),
+                  ),
+                  child: TextFormField(
+                    controller: titleController,
+                    decoration: const InputDecoration(
+                      hintText: 'Nama',
+                      hintStyle: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.normal,
+                      ),
+                      border: UnderlineInputBorder(
+                          borderSide:
+                              BorderSide(style: BorderStyle.none, width: 0)),
+                    ),
+                    validator: (String? value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Wajib diisi';
+                      }
+                      return null;
+                    },
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Container(
+                  height: 50,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    border: Border.all(
+                        width: 1, color: Colors.grey.withOpacity(0.4)),
+                    borderRadius: const BorderRadius.all(Radius.circular(8)),
+                  ),
+                  child: TextFormField(
+                    controller: descriptionController,
+                    decoration: const InputDecoration(
+                      hintText: 'Deskripsi',
+                      hintStyle: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.normal,
+                      ),
+                      border: UnderlineInputBorder(
+                          borderSide:
+                              BorderSide(style: BorderStyle.none, width: 0)),
+                    ),
+                    validator: (String? value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Wajib diisi';
+                      }
+                      return null;
+                    },
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Container(
+                  height: 50,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    border: Border.all(
+                        width: 1, color: Colors.grey.withOpacity(0.4)),
+                    borderRadius: const BorderRadius.all(Radius.circular(8)),
+                  ),
+                  child: TextFormField(
+                    controller: priceController,
+                    keyboardType: TextInputType.number,
+                    inputFormatters: <TextInputFormatter>[
+                      FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+                      FilteringTextInputFormatter.digitsOnly
+                    ],
+                    decoration: const InputDecoration(
+                      hintText: 'Harga (Rp)',
+                      hintStyle: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.normal,
+                      ),
+                      border: UnderlineInputBorder(
+                          borderSide:
+                              BorderSide(style: BorderStyle.none, width: 0)),
+                    ),
+                    validator: (String? value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Wajib diisi';
+                      }
+                      return null;
+                    },
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Container(
+                  height: 50,
                   width: double.maxFinite,
                   decoration: const BoxDecoration(
-                    color: Colors.black,
+                    color: Colors.blue,
                     borderRadius: BorderRadius.all(Radius.circular(8)),
                   ),
                   child: RawMaterialButton(
                     onPressed: () async {
                       if (_formKey.currentState!.validate()) {
-                        Map<String, dynamic> data = {
-                          title: titleController.text,
-                          description: descriptionController.text
-                        };
-                        log('data: $data');
-                        dynamic result =
-                            await SqliteService.createItem(data as Menu);
-                        if (result == null) {}
+                        try {
+                          await DatabaseHelper.insertItem(
+                              titleController.text,
+                              descriptionController.text,
+                              int.parse(priceController.text));
+                          ElegantNotification.success(
+                            title: const Text("Berhasil"),
+                            description: const Text("Data berhasil disimpan"),
+                          ).show(context);
+                        } catch (e) {
+                          ElegantNotification.error(
+                            title: const Text("Gagal"),
+                            description: const Text("Data gagal disimpan"),
+                          ).show(context);
+                          log('err: $e');
+                        }
                       }
                     },
                     child: const Center(
@@ -121,73 +198,14 @@ class BottomDialog {
                         'Simpan Data',
                         style: TextStyle(
                           color: Colors.white,
-                          fontWeight: FontWeight.w500,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
                   ),
                 ),
               ],
-            ),
-          ),
-          // Column(
-          //   children: [
-          //     const SizedBox(height: 16),
-          //     _buildTitle(),
-          //     const SizedBox(height: 16),
-          //     _buildTextField(),
-          //     const SizedBox(height: 16),
-          //     _buildContinueButton(),
-          //   ],
-          // ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildTitle() {
-    return const Text(
-      'Formulir Menu',
-      style: TextStyle(
-        fontSize: 22,
-        fontWeight: FontWeight.w500,
-      ),
-    );
-  }
-
-  Widget _buildTextField() {
-    return Container(
-      height: 50,
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border.all(width: 1, color: Colors.grey.withOpacity(0.4)),
-        borderRadius: const BorderRadius.all(Radius.circular(8)),
-      ),
-      child: const TextField(
-        decoration: InputDecoration.collapsed(hintText: 'Nama'),
-      ),
-    );
-  }
-
-  Widget _buildContinueButton() {
-    return Container(
-      height: 40,
-      width: double.maxFinite,
-      decoration: const BoxDecoration(
-        color: Colors.black,
-        borderRadius: BorderRadius.all(Radius.circular(8)),
-      ),
-      child: RawMaterialButton(
-        onPressed: () {
-          // Navigator.of(context, rootNavigator: true).pop();
-        },
-        child: const Center(
-          child: Text(
-            'Simpan Data',
-            style: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.w500,
             ),
           ),
         ),
