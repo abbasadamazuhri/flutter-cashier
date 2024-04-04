@@ -148,9 +148,7 @@ class _DatasetPageState extends State<DatasetPage> {
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: BottomNavigationBar(
           onTap: (index) {
-            setState(() {
-              selectedIndex = index;
-            });
+            refresh();
           },
           currentIndex: selectedIndex,
           showSelectedLabels: false,
