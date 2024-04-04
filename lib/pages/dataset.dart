@@ -26,14 +26,13 @@ class _DatasetPageState extends State<DatasetPage> {
       ElegantNotification.error(
         title: const Text("Gagal"),
         description: const Text("Data gagal diambil"),
-      ).show(context);
+      ).show(context.mounted as BuildContext);
     }
   }
 
   @override
   void initState() {
     super.initState();
-    // DatabaseHelper.deleteDatabase();
     DatabaseHelper.initizateDb().whenComplete(() async {
       refresh();
     });

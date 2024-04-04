@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:elegant_notification/elegant_notification.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_ecashier/pages/dataset.dart';
 import 'package:flutter_ecashier/services/db.dart';
 
 class BottomDialog {
@@ -175,21 +176,20 @@ class BottomDialog {
                   child: RawMaterialButton(
                     onPressed: () async {
                       if (_formKey.currentState!.validate()) {
-                        try {
-                          await DatabaseHelper.insertItem(
-                              titleController.text,
-                              descriptionController.text,
-                              int.parse(priceController.text));
+                        var res = await DatabaseHelper.insertItem(
+                            titleController.text,
+                            descriptionController.text,
+                            int.parse(priceController.text));
+                        if (res == 1) {
                           ElegantNotification.success(
                             title: const Text("Berhasil"),
                             description: const Text("Data berhasil disimpan"),
-                          ).show(context);
-                        } catch (e) {
+                          ).show(context.mounted as BuildContext);
+                        } else {
                           ElegantNotification.error(
                             title: const Text("Gagal"),
                             description: const Text("Data gagal disimpan"),
                           ).show(context);
-                          log('err: $e');
                         }
                       }
                     },
